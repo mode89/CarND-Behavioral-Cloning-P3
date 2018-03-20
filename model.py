@@ -2,7 +2,7 @@ import csv
 import cv2
 import numpy
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Cropping2D
+from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D
 
 def load_log(path, images, steeringAngles):
     with open(path) as drivingLog:
@@ -23,12 +23,29 @@ def load_training_data():
 trainX, trainY = load_training_data()
 
 model = Sequential()
+
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((60, 30), (0, 0))))
+
+model.add(Conv2D(24, (5, 5),
+    padding="valid", activation="relu", strides=(2, 2)))
+model.add(Conv2D(36, (5, 5),
+    padding="valid", activation="relu", strides=(2, 2)))
+model.add(Conv2D(48, (5, 5),
+    padding="valid", activation="relu", strides=(2, 2)))
+model.add(Conv2D(64, (3, 3),
+    padding="valid", activation="relu", strides=(1, 1)))
+model.add(Conv2D(64, (3, 3),
+    padding="valid", activation="relu", strides=(1, 1)))
 model.add(Flatten())
+model.add(Dense(1164, activation="relu"))
+model.add(Dense(100, activation="relu"))
+model.add(Dense(50, activation="relu"))
+model.add(Dense(10, activation="relu"))
+
 model.add(Dense(1))
 
 model.compile(loss="mse", optimizer="adam")
-model.fit(trainX, trainY, validation_split=0.2, shuffle=True, epochs=11)
+model.fit(trainX, trainY, validation_split=0.2, shuffle=True, epochs=5)
 
 model.save("model.h5")
