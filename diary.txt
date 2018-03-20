@@ -1,0 +1,30 @@
+Training data
+
+* Build and installed OpenCV 3.4.0. Couldn't get to build it with CUDA
+  support.
+* Capture training data by driving a single lap in a clockwise direction and
+  driving a single lap in a counter clockwise direction. Totally having
+  around 2200 images.
+* Implement loading of training data using csv.reader and cv2.imread.
+
+Simple regression model
+
+* Train a simple regression model, containing a single flatten layer and a
+  single fully connected layer. After 8 training epochs training loss
+  reaches ~2000 and validation loss reaches ~2500. Driving in simulator is
+  very rough, steering angle changes rapidly.
+* Implemented input image normalization with Lambda layer and cropping with
+  Cropping2D layer removing the top 60 lines and the bottom 30 lines. After
+  2 training epochs both losses drops down to 0.2 and then raises above 1.0.
+  After the 10th epoch the training loss is ~0.13 and the validation loss is
+  ~0.17. Driving in simulator is smoother, but steering angle is still
+  unstable and the car tends to leave the track.
+* Use MSE loss, ADAM optimizer, shuffling and 20% of training data for
+  validation.
+
+Nvidia's network
+
+* Implemented a network described by "End to End Learning for Self-Driving
+  Cars".
+* After 5 training epochs, training loss gets down to 0.0003 and validation
+  loss - down to 0.003. Looks like the model is overfitting.
