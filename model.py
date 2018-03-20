@@ -3,6 +3,7 @@ import cv2
 import numpy
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D
+import os
 
 def load_log(path, images, steeringAngles):
     with open(path) as drivingLog:
@@ -22,14 +23,18 @@ def load_log(path, images, steeringAngles):
             images.append(rightImage)
             steeringAngles.append(angle - 0.2)
 
-def load_training_data():
+def load_training_data(dirs):
     images = list()
     steeringAngles = list()
-    load_log("data/3-1l-ccw/driving_log.csv", images, steeringAngles)
-    load_log("data/4-1l-cw/driving_log.csv", images, steeringAngles)
+    for directory in dirs:
+        load_log(os.path.join(directory, "driving_log.csv"),
+            images, steeringAngles)
     return numpy.array(images), numpy.array(steeringAngles)
 
-trainX, trainY = load_training_data()
+trainX, trainY = load_training_data([
+    "data/3-1l-ccw",
+    "data/4-1l-cw",
+])
 
 model = Sequential()
 
