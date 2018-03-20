@@ -8,10 +8,19 @@ def load_log(path, images, steeringAngles):
     with open(path) as drivingLog:
         reader = csv.reader(drivingLog)
         for line in reader:
-            imagePath = line[0]
-            image = cv2.imread(imagePath)
-            images.append(image)
-            steeringAngles.append(float(line[3]))
+            angle = float(line[3])
+
+            centerImage = cv2.imread(line[0])
+            images.append(centerImage)
+            steeringAngles.append(angle)
+
+            leftImage = cv2.imread(line[1])
+            images.append(leftImage)
+            steeringAngles.append(angle + 0.2)
+
+            rightImage = cv2.imread(line[2])
+            images.append(rightImage)
+            steeringAngles.append(angle - 0.2)
 
 def load_training_data():
     images = list()
