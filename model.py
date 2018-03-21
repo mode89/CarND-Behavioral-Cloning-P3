@@ -4,6 +4,7 @@ import numpy
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D, Dropout
+from keras.optimizers import Adam
 import os
 
 def load_log(path, images, steeringAngles):
@@ -73,7 +74,8 @@ model.add(Dropout(0.5))
 
 model.add(Dense(1))
 
-model.compile(loss="mse", optimizer="adam")
+adam = Adam(lr=0.001, decay=0.1)
+model.compile(loss="mse", optimizer=adam)
 
 modelCheckpoint = ModelCheckpoint(
     filepath="models/model-{val_loss:.4f}-{loss:.4f}-{epoch:02d}.hdf5",
