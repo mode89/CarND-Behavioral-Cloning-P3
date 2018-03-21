@@ -1,6 +1,7 @@
 import csv
 import cv2
 import numpy
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D, Dropout
 import os
@@ -64,6 +65,21 @@ model.add(Dropout(0.5))
 model.add(Dense(1))
 
 model.compile(loss="mse", optimizer="adam")
-model.fit(trainX, trainY, validation_split=0.2, shuffle=True, epochs=10)
 
-model.save("model.h5")
+modelCheckpoint = ModelCheckpoint(
+    filepath="models/model-{val_loss:.4f}-{loss:.4f}-{epoch:02d}.hdf5",
+    monitor="val_loss",
+    verbose=1,
+    save_best_only=True)
+earlyStopping = EarlyStopping(
+    monitor="val_loss",
+    min_delta=0.001,
+    patience=10)
+model.fit(trainX, trainY,
+    callbacks=[
+        modelCheckpoint,
+        earlyStopping,
+    ],
+    validation_split=0.2,
+    shuffle=True,
+    epochs=100)
