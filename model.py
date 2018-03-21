@@ -7,21 +7,29 @@ from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D, Dropout
 from keras.optimizers import Adam
 import os
 
+def convert_image_path(dirPath, imagePath):
+    return os.path.join(dirPath, "IMG", os.path.basename(imagePath))
+
 def load_log(path, images, steeringAngles):
+    dirPath = os.path.dirname(path)
+    print("Loading images from {}".format(dirPath))
     with open(path) as drivingLog:
         reader = csv.reader(drivingLog)
         for line in reader:
             angle = float(line[3])
 
-            centerImage = cv2.imread(line[0])
+            centerImagePath = convert_image_path(dirPath, line[0])
+            centerImage = cv2.imread(centerImagePath)
             images.append(centerImage)
             steeringAngles.append(angle)
 
-            leftImage = cv2.imread(line[1])
+            leftImagePath = convert_image_path(dirPath, line[1])
+            leftImage = cv2.imread(leftImagePath)
             images.append(leftImage)
             steeringAngles.append(angle + 0.2)
 
-            rightImage = cv2.imread(line[2])
+            rightImagePath = convert_image_path(dirPath, line[2])
+            rightImage = cv2.imread(rightImagePath)
             images.append(rightImage)
             steeringAngles.append(angle - 0.2)
 
