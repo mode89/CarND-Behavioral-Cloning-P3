@@ -83,7 +83,7 @@ model.add(Dropout(0.5))
 
 model.add(Dense(1))
 
-adam = Adam(lr=0.001, decay=0.1)
+adam = Adam(lr=0.001, decay=0.01)
 model.compile(loss="mse", optimizer=adam)
 
 if not os.path.exists("models"):
