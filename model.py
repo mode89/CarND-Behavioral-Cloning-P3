@@ -86,6 +86,8 @@ model.add(Dense(1))
 adam = Adam(lr=0.001, decay=0.1)
 model.compile(loss="mse", optimizer=adam)
 
+if not os.path.exists("models"):
+    os.mkdir("models")
 modelCheckpoint = ModelCheckpoint(
     filepath="models/model-{val_loss:.4f}-{loss:.4f}-{epoch:02d}.hdf5",
     monitor="val_loss",
