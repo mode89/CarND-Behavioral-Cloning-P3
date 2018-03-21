@@ -63,6 +63,7 @@ model.add(Conv2D(64, (3, 3),
 model.add(Conv2D(64, (3, 3),
     padding="valid", activation="relu", strides=(1, 1)))
 model.add(Flatten())
+model.add(Dropout(0.5))
 model.add(Dense(1164, activation="relu"))
 model.add(Dropout(0.5))
 model.add(Dense(100, activation="relu"))
