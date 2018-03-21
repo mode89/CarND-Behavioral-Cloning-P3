@@ -95,7 +95,7 @@ modelCheckpoint = ModelCheckpoint(
     save_best_only=True)
 earlyStopping = EarlyStopping(
     monitor="val_loss",
-    min_delta=0.001,
+    min_delta=0.0001,
     patience=10)
 model.fit(trainX, trainY,
     callbacks=[
