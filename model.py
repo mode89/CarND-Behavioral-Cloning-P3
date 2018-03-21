@@ -32,6 +32,12 @@ def load_training_data(dirs):
             images, steeringAngles)
     return numpy.array(images), numpy.array(steeringAngles)
 
+def rgb_to_gray(x):
+    return 0.3 * x[:,:,:,0:1] + 0.59 * x[:,:,:,1:2] + 0.11 * x[:,:,:,-1:]
+
+def normalize(x):
+    return x / 255.0 - 0.5
+
 trainX, trainY = load_training_data([
     "data/3-1l-ccw",
     "data/4-1l-cw",
@@ -39,8 +45,11 @@ trainX, trainY = load_training_data([
 
 model = Sequential()
 
-model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160, 320, 3)))
-model.add(Cropping2D(cropping=((60, 30), (0, 0))))
+model.add(Cropping2D(
+    cropping=((50, 25), (0, 0)),
+    input_shape=(160, 320, 3)))
+model.add(Lambda(rgb_to_gray))
+model.add(Lambda(normalize))
 
 model.add(Conv2D(24, (5, 5),
     padding="valid", activation="relu", strides=(2, 2)))
