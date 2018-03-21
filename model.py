@@ -102,6 +102,7 @@ model.fit(trainX, trainY,
         modelCheckpoint,
         earlyStopping,
     ],
+    batch_size=128,
     validation_split=0.2,
     shuffle=True,
     epochs=100)
