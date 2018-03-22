@@ -55,7 +55,7 @@ trainX, trainY = load_training_data([
 model = Sequential()
 
 model.add(Cropping2D(
-    cropping=((50, 25), (0, 0)),
+    cropping=((70, 25), (0, 0)),
     input_shape=(160, 320, 3)))
 model.add(Lambda(rgb_to_gray))
 model.add(Lambda(normalize))
