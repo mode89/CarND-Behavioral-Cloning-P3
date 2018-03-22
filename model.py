@@ -48,8 +48,12 @@ def normalize(x):
     return x / 255.0 - 0.5
 
 trainX, trainY = load_training_data([
-    "data/3-1l-ccw",
-    "data/4-1l-cw",
+    "data/10-1l-ccw",
+    "data/11-1l-cw",
+    "data/12-10-2c-ccw",
+    "data/13-10-3c-ccw",
+    "data/14-10-2c-ccw",
+    "data/15-10-3c-ccw",
 ])
 
 model = Sequential()
