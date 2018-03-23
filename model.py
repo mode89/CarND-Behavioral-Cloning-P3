@@ -41,58 +41,65 @@ def rgb_to_gray(x):
 def normalize(x):
     return x / 255.0 - 0.5
 
+def create_model():
+    model = Sequential()
 
-model = Sequential()
+    model.add(Cropping2D(
+        cropping=((70, 25), (0, 0)),
+        input_shape=(160, 320, 3)))
+    model.add(Lambda(rgb_to_gray))
+    model.add(Lambda(normalize))
 
-model.add(Cropping2D(
-    cropping=((70, 25), (0, 0)),
-    input_shape=(160, 320, 3)))
-model.add(Lambda(rgb_to_gray))
-model.add(Lambda(normalize))
+    model.add(Conv2D(24, (5, 5),
+        padding="valid", activation="relu", strides=(2, 2)))
+    model.add(Conv2D(36, (5, 5),
+        padding="valid", activation="relu", strides=(2, 2)))
+    model.add(Conv2D(48, (5, 5),
+        padding="valid", activation="relu", strides=(2, 2)))
+    model.add(Conv2D(64, (3, 3),
+        padding="valid", activation="relu", strides=(1, 1)))
+    model.add(Conv2D(64, (3, 3),
+        padding="valid", activation="relu", strides=(1, 1)))
+    model.add(Flatten())
+    model.add(Dropout(0.5))
+    model.add(Dense(1164, activation="relu"))
+    model.add(Dropout(0.5))
+    model.add(Dense(100, activation="relu"))
+    model.add(Dropout(0.5))
+    model.add(Dense(50, activation="relu"))
+    model.add(Dropout(0.5))
+    model.add(Dense(10, activation="relu"))
+    model.add(Dropout(0.5))
 
-model.add(Conv2D(24, (5, 5),
-    padding="valid", activation="relu", strides=(2, 2)))
-model.add(Conv2D(36, (5, 5),
-    padding="valid", activation="relu", strides=(2, 2)))
-model.add(Conv2D(48, (5, 5),
-    padding="valid", activation="relu", strides=(2, 2)))
-model.add(Conv2D(64, (3, 3),
-    padding="valid", activation="relu", strides=(1, 1)))
-model.add(Conv2D(64, (3, 3),
-    padding="valid", activation="relu", strides=(1, 1)))
-model.add(Flatten())
-model.add(Dropout(0.5))
-model.add(Dense(1164, activation="relu"))
-model.add(Dropout(0.5))
-model.add(Dense(100, activation="relu"))
-model.add(Dropout(0.5))
-model.add(Dense(50, activation="relu"))
-model.add(Dropout(0.5))
-model.add(Dense(10, activation="relu"))
-model.add(Dropout(0.5))
+    model.add(Dense(1))
 
-model.add(Dense(1))
+    return model
 
-adam = Adam(lr=0.001, decay=0.01)
-model.compile(loss="mse", optimizer=adam)
+def compile_model(model):
+    adam = Adam(lr=0.001, decay=0.01)
+    model.compile(loss="mse", optimizer=adam)
 
-if not os.path.exists("models"):
-    os.mkdir("models")
-modelCheckpoint = ModelCheckpoint(
-    filepath="models/model-{val_loss:.4f}-{loss:.4f}-{epoch:02d}.hdf5",
-    monitor="val_loss",
-    verbose=1,
-    save_best_only=True)
-earlyStopping = EarlyStopping(
-    monitor="val_loss",
-    min_delta=0.0001,
-    patience=10)
-model.fit(trainX, trainY,
-    callbacks=[
-        modelCheckpoint,
-        earlyStopping,
-    ],
-    batch_size=128,
-    validation_split=0.2,
-    shuffle=True,
-    epochs=100)
+def train_model(model):
+    if not os.path.exists("models"):
+        os.mkdir("models")
+
+    modelCheckpoint = ModelCheckpoint(
+        filepath="models/model-{val_loss:.4f}-{loss:.4f}-{epoch:02d}.hdf5",
+        monitor="val_loss",
+        verbose=1,
+        save_best_only=True)
+
+    earlyStopping = EarlyStopping(
+        monitor="val_loss",
+        min_delta=0.0001,
+        patience=10)
+
+    model.fit(trainX, trainY,
+        callbacks=[
+            modelCheckpoint,
+            earlyStopping,
+        ],
+        batch_size=128,
+        validation_split=0.2,
+        shuffle=True,
+        epochs=100)
