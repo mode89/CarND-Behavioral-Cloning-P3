@@ -6,6 +6,10 @@ from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D, Dropout
 from keras.optimizers import Adam
 import os
+from sklearn.model_selection import train_test_split
+import random
+
+BATCH_SIZE = 256
 
 def convert_image_path(dirPath, imagePath):
     return os.path.join(dirPath, "IMG", os.path.basename(imagePath))
@@ -16,7 +20,7 @@ class Sample:
         self.centerImagePath = convert_image_path(dirPath, line[0])
         self.leftImagePath = convert_image_path(dirPath, line[1])
         self.rightImagePath = convert_image_path(dirPath, line[2])
-        self.steeringAngle = line[3]
+        self.steeringAngle = float(line[3])
 
 def read_log(path):
     print("Reading log {} ...".format(path))
@@ -34,6 +38,25 @@ def read_logs(dirs):
     for directory in dirs:
         samples += read_log(os.path.join(directory, "driving_log.csv"))
     return samples
+
+def generator(samples, batchSize):
+    numSamples = len(samples)
+    while True:
+        random.shuffle(samples)
+        for offset in range(0, numSamples, batchSize):
+            images = list()
+            angles = list()
+            batchSamples = samples[offset:offset + batchSize]
+            for sample in batchSamples:
+                images.append(cv2.imread(sample.centerImagePath))
+                angles.append(sample.steeringAngle)
+                images.append(cv2.imread(sample.leftImagePath))
+                angles.append(sample.steeringAngle + 0.2)
+                images.append(cv2.imread(sample.rightImagePath))
+                angles.append(sample.steeringAngle - 0.2)
+        trainX = numpy.array(images)
+        trainY = numpy.array(angles)
+        yield (trainX, trainY)
 
 def rgb_to_gray(x):
     return 0.3 * x[:,:,:,0:1] + 0.59 * x[:,:,:,1:2] + 0.11 * x[:,:,:,-1:]
@@ -79,9 +102,15 @@ def compile_model(model):
     adam = Adam(lr=0.001, decay=0.01)
     model.compile(loss="mse", optimizer=adam)
 
-def train_model(model):
+def train_model(model, samples):
     if not os.path.exists("models"):
         os.mkdir("models")
+
+    trainSamples, validationSamples = \
+        train_test_split(samples, test_size=0.2)
+
+    trainGenerator = generator(trainSamples, BATCH_SIZE)
+    validationGenerator = generator(validationSamples, BATCH_SIZE)
 
     modelCheckpoint = ModelCheckpoint(
         filepath="models/model-{val_loss:.4f}-{loss:.4f}-{epoch:02d}.hdf5",
@@ -94,14 +123,15 @@ def train_model(model):
         min_delta=0.0001,
         patience=10)
 
-    model.fit(trainX, trainY,
+    model.fit_generator(
+        generator=trainGenerator,
+        steps_per_epoch=len(trainSamples)//BATCH_SIZE,
+        validation_data=validationGenerator,
+        validation_steps=len(validationSamples)//BATCH_SIZE,
         callbacks=[
             modelCheckpoint,
             earlyStopping,
         ],
-        batch_size=128,
-        validation_split=0.2,
-        shuffle=True,
         epochs=100)
 
 if __name__ == "__main__":
@@ -113,3 +143,7 @@ if __name__ == "__main__":
         "data/14-10-2c-ccw",
         "data/15-10-3c-ccw",
     ])
+
+    model = create_model()
+    compile_model(model)
+    train_model(model, samples)
