@@ -103,3 +103,13 @@ def train_model(model):
         validation_split=0.2,
         shuffle=True,
         epochs=100)
+
+if __name__ == "__main__":
+    samples = read_logs([
+        "data/10-1l-ccw",
+        "data/11-1l-cw",
+        "data/12-10-2c-ccw",
+        "data/13-10-3c-ccw",
+        "data/14-10-2c-ccw",
+        "data/15-10-3c-ccw",
+    ])
