@@ -10,36 +10,30 @@ import os
 def convert_image_path(dirPath, imagePath):
     return os.path.join(dirPath, "IMG", os.path.basename(imagePath))
 
-def load_log(path, images, steeringAngles):
+class Sample:
+
+    def __init__(self, dirPath, line):
+        self.centerImagePath = convert_image_path(dirPath, line[0])
+        self.leftImagePath = convert_image_path(dirPath, line[1])
+        self.rightImagePath = convert_image_path(dirPath, line[2])
+        self.steeringAngle = line[3]
+
+def read_log(path):
+    print("Reading log {} ...".format(path))
     dirPath = os.path.dirname(path)
-    print("Loading images from {}".format(dirPath))
+    samples = list()
     with open(path) as drivingLog:
         reader = csv.reader(drivingLog)
         for line in reader:
-            angle = float(line[3])
+            sample = Sample(dirPath, line)
+            samples.append(sample)
+    return samples
 
-            centerImagePath = convert_image_path(dirPath, line[0])
-            centerImage = cv2.imread(centerImagePath)
-            images.append(centerImage)
-            steeringAngles.append(angle)
-
-            leftImagePath = convert_image_path(dirPath, line[1])
-            leftImage = cv2.imread(leftImagePath)
-            images.append(leftImage)
-            steeringAngles.append(angle + 0.2)
-
-            rightImagePath = convert_image_path(dirPath, line[2])
-            rightImage = cv2.imread(rightImagePath)
-            images.append(rightImage)
-            steeringAngles.append(angle - 0.2)
-
-def load_training_data(dirs):
-    images = list()
-    steeringAngles = list()
+def read_logs(dirs):
+    samples = list()
     for directory in dirs:
-        load_log(os.path.join(directory, "driving_log.csv"),
-            images, steeringAngles)
-    return numpy.array(images), numpy.array(steeringAngles)
+        samples += read_log(os.path.join(directory, "driving_log.csv"))
+    return samples
 
 def rgb_to_gray(x):
     return 0.3 * x[:,:,:,0:1] + 0.59 * x[:,:,:,1:2] + 0.11 * x[:,:,:,-1:]
@@ -47,14 +41,6 @@ def rgb_to_gray(x):
 def normalize(x):
     return x / 255.0 - 0.5
 
-trainX, trainY = load_training_data([
-    "data/10-1l-ccw",
-    "data/11-1l-cw",
-    "data/12-10-2c-ccw",
-    "data/13-10-3c-ccw",
-    "data/14-10-2c-ccw",
-    "data/15-10-3c-ccw",
-])
 
 model = Sequential()
 
