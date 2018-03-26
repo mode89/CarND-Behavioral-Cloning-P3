@@ -104,8 +104,7 @@ def create_model():
     return model
 
 def compile_model(model):
-    adam = Adam(lr=0.001, decay=0.01)
-    model.compile(loss="mse", optimizer=adam)
+    model.compile(loss="mse", optimizer="adam")
 
 def train_model(model, samples):
     if not os.path.exists("models"):
