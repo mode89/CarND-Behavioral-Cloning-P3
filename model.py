@@ -146,6 +146,7 @@ if __name__ == "__main__":
         "data/13-10-3c-ccw",
         "data/14-10-2c-ccw",
         "data/15-10-3c-ccw",
+        "data/16-10-2c-ccw",
     ])
 
     model = create_model()
