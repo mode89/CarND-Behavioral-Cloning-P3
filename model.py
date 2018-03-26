@@ -64,12 +64,17 @@ def rgb_to_gray(x):
 def normalize(x):
     return x / 255.0 - 0.5
 
+def scale_down(image):
+    from keras.backend import tf as ktf
+    return ktf.image.resize_images(image, (64, 128))
+
 def create_model():
     model = Sequential()
 
     model.add(Cropping2D(
         cropping=((70, 25), (0, 0)),
         input_shape=(160, 320, 3)))
+    model.add(Lambda(scale_down))
     model.add(Lambda(rgb_to_gray))
     model.add(Lambda(normalize))
 
