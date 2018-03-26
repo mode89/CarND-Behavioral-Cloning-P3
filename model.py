@@ -140,13 +140,13 @@ def train_model(model, samples):
 
 if __name__ == "__main__":
     samples = read_logs([
-        "data/10-1l-ccw",
-        "data/11-1l-cw",
-        "data/12-10-2c-ccw",
-        "data/13-10-3c-ccw",
-        "data/14-10-2c-ccw",
-        "data/15-10-3c-ccw",
-        "data/16-10-2c-ccw",
+        "data/10-1l-ccw", # One lap counter clockwise
+        "data/11-1l-cw", # One lap clockwise
+        "data/12-10-2c-ccw", # 10 runs over the second corner
+        "data/13-10-3c-ccw", # 10 runs over the third corner
+        "data/14-10-2c-ccw", # 10 runs over the second corner
+        "data/15-10-3c-ccw", # 10 runs over the third corner
+        "data/16-10-2c-ccw", # 10 runs over the second corner
     ])
 
     model = create_model()
