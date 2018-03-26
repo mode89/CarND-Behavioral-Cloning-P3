@@ -9,7 +9,7 @@ import os
 from sklearn.model_selection import train_test_split
 import random
 
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 
 def convert_image_path(dirPath, imagePath):
     return os.path.join(dirPath, "IMG", os.path.basename(imagePath))
